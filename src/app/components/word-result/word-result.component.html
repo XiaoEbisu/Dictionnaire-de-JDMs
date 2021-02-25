@@ -1,0 +1,477 @@
+<div class="row mt-3 words-content">
+  <div class="row justify-content-center spinner">
+    <ng-container *ngIf="isLoading">
+      <mat-spinner></mat-spinner>
+    </ng-container>
+  </div>
+
+  <ng-container *ngIf="words.length > 0">
+    <div class="col-md-4">
+      <div class="row">
+        <h1> {{motif}} </h1>
+      </div>
+      <div class="button-collapse">
+        <button
+          *ngIf="definition"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#definition"
+          aria-expanded="true"
+          aria-controls="collapseDefinition"
+        >
+          Definition
+        </button>
+        <button
+          *ngIf="containsRelationType(4)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#category"
+          aria-expanded="true"
+          aria-controls="collapseCategory"
+        >
+          Catégories
+        </button>
+        <button
+          *ngIf="containsRelationType(2)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#raffinementMorphologique"
+          aria-expanded="true"
+          aria-controls="collapseRaffinementMorphologique"
+        >
+          Raffinnements morphologiques
+        </button>
+        <button
+          *ngIf="containsRelationType(1)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#raffinementSemantique"
+          aria-expanded="true"
+          aria-controls="collapseRaffinementSemantique"
+        >
+          Raffinnements sémantiques
+        </button>
+        <button
+          *ngIf="containsRelationType(19)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#lemme"
+          aria-expanded="true"
+          aria-controls="collapseLemme"
+        >
+          Lemme
+        </button>
+        <button
+          *ngIf="containsRelationType(77)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#PPasse"
+          aria-expanded="true"
+          aria-controls="collapsePPasse"
+        >
+          Participe passé
+        </button>
+        <button
+          *ngIf="containsRelationType(79)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#PPresent"
+          aria-expanded="true"
+          aria-controls="collapsePPresent"
+        >
+          Participe présent
+        </button>
+
+        <button
+          *ngIf="containsRelationType(18)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#InformationsLexicales"
+          aria-expanded="true"
+          aria-controls="collapseInformationsLexicales"
+        >
+          Informations Lexicales
+        </button>
+
+        <button
+          *ngIf="containsRelationType(0)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#ideeAssociation"
+          aria-expanded="true"
+          aria-controls="collapseIdeeAssociation"
+        >
+          Association d'idées
+        </button>
+        <button
+          *ngIf="containsRelationType(3)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#domaine"
+          aria-expanded="true"
+          aria-controls="collapseDomaine"
+        >
+          Domaines/Thèmes
+        </button>
+        <button
+          *ngIf="containsRelationType(6)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#generiques"
+          aria-expanded="true"
+          aria-controls="collapseGeneriques"
+        >
+          Génériques
+        </button>
+        <button
+          *ngIf="containsRelationType(5)"
+          class="btn btn-primary"
+          type="button"
+          data-toggle="collapse"
+          href="#synonyme"
+          aria-expanded="true"
+          aria-controls="collapseSynonyme"
+        >
+          Synonymes
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="box definition">
+        <div class="collapse" [ngClass]="{show: definition}" id="definition">
+          <div class="card card-body">
+            <h5 class="card-title">Définition</h5>
+            <p class="card-text">{{ definition }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="box category">
+        <div class="collapse" [ngClass]="{show: containsRelationType(4)}" id="category">
+          <div class="card card-body">
+            <h5 class="card-title">Catégories</h5>
+            <p>
+              <ng-container *ngFor="let word of words; last as isLast">
+                <ng-container
+                  class="card-text"
+                  *ngIf="word.r_type == 4 && word.poids > 0"
+                >
+                  <p
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                  >
+                    {{ parserCategoryName(word.r_node2) }}<br />
+                  </p>
+                </ng-container>
+              </ng-container>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="box morphologique">
+        <div class="collapse" [ngClass]="{show: containsRelationType(2)}" id="raffinementMorphologique">
+          <div class="card card-body">
+            <h5 class="card-title">Raffinements Morphologiques</h5>
+            <p>
+              <ng-container *ngFor="let word of words; last as isLast">
+                <ng-container
+                  class="card-text"
+                  *ngIf="word.r_type == 2 && word.poids > 0"
+                >
+                  <ng-container
+                    *ngIf="
+                      !requireFormatedName(getNameFromEid(word.r_node2));
+                      then if_block;
+                      else else_block
+                    "
+                  ></ng-container>
+                  <ng-template #if_block>
+                    <a
+                      [routerLink]="[
+                        '/find/definition/',
+                        convertToFormatedName(word.r_node2)
+                      ]"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                      >{{ word.r_node2 }} <br
+                    /></a>
+                  </ng-template>
+                  <ng-template #else_block>
+                    <a
+                      [routerLink]="[
+                        '/find/definition/',
+                        convertToFormatedName(word.r_node2)
+                      ]"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                      >{{ parserFormatedName(word.r_node2) }} <br
+                    /></a>
+                  </ng-template>
+                </ng-container>
+              </ng-container>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="box semantique">
+        <div class="collapse" [ngClass]="{show: containsRelationType(1)}" id="raffinementSemantique">
+          <div class="card card-body">
+            <h5 class="card-title">Raffinements Sémantiques</h5>
+            <p>
+              <ng-container *ngFor="let word of words; last as isLast">
+                <ng-container
+                  class="card-text"
+                  *ngIf="word.r_type == 1 && word.poids > 0"
+                >
+                  <ng-container
+                    *ngIf="
+                      !requireFormatedName(word.r_node2);
+                      then if_block;
+                      else else_block
+                    "
+                  ></ng-container>
+                  <ng-template #if_block>
+                    <a
+                      [routerLink]="[
+                        '/find/definition/',
+                        convertToFormatedName(word.r_node2)
+                      ]"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                      >{{ word.r_node2 }} <br
+                    /></a>
+                  </ng-template>
+                  <ng-template #else_block>
+                    <a
+                      [routerLink]="[
+                        '/find/definition/',
+                        convertToFormatedName(word.r_node2)
+                      ]"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                      >{{ parserFormatedName(word.r_node2) }} <br
+                    /></a>
+                  </ng-template>
+                </ng-container>
+              </ng-container>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="box lemme">
+        <div class="collapse" [ngClass]="{show: containsRelationType(19)}" id="lemme">
+          <div class="card card-body">
+            <h5 class="card-title">Lemme</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 19 && word.poids > 0"
+              >
+                <p
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                >
+                  {{ getNameFromEid(word.r_node2) }} <br />
+                </p>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box PPasse">
+        <div class="collapse" [ngClass]="{show: containsRelationType(77)}" id="PPasse">
+          <div class="card card-body">
+            <h5 class="card-title">Participe passé</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 77 && word.poids > 0"
+              >
+                <p
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                >
+                  {{ getNameFromEid(word.r_node2) }} <br />
+                </p>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box PPresent">
+        <div class="collapse" [ngClass]="{show: containsRelationType(79)}" id="PPresent">
+          <div class="card card-body">
+            <h5 class="card-title">Participe présent</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 79 && word.poids > 0"
+              >
+                <p
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                >
+                  {{ getNameFromEid(word.r_node2) }} <br />
+                </p>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box InformationsLexicales">
+        <div class="collapse" [ngClass]="{show: containsRelationType(18)}" id="InformationsLexicales">
+          <div class="card card-body">
+            <h5 class="card-title">Informations Lexicales</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 18 && word.poids > 0"
+              >
+                <p
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                >
+                  {{ getNameFromEid(word.r_node2) }}
+                </p>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box IdeeAssociation">
+        <div class="collapse" [ngClass]="{show: containsRelationType(0)}" id="ideeAssociation">
+          <div class="card card-body">
+            <h5 class="card-title">Associations d'idées</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 0 && word.poids > 0"
+              >
+                <a
+                  [routerLink]="[
+                    '/find/definition/',
+                    convertToFormatedName(word.r_node2)
+                  ]"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                  >{{ parserFormatedName(word.r_node2) }}
+                </a>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box domaine">
+        <div class="collapse" [ngClass]="{show: containsRelationType(3)}" id="domaine">
+          <div class="card card-body">
+            <h5 class="card-title">Domaines/Thèmes</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 3 && word.poids > 0"
+              >
+                <a
+                  [routerLink]="[
+                    '/find/definition/',
+                    convertToFormatedName(word.r_node2)
+                  ]"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                  >{{ getNameFromEid(word.r_node2) }}
+                </a>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box Generiques">
+        <div class="collapse" [ngClass]="{show: containsRelationType(6)}" id="generiques">
+          <div class="card card-body">
+            <h5 class="card-title">Génériques</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 6 && word.poids > 0"
+              >
+                <a
+                  [routerLink]="[
+                    '/find/definition/',
+                    convertToFormatedName(word.r_node2)
+                  ]"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                >
+                  {{ convertToFormatedName(word.r_node2) }}
+                </a>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="box Synonyme">
+        <div class="collapse" [ngClass]="{show: containsRelationType(5)}" id="synonyme">
+          <div class="card card-body">
+            <h5 class="card-title">Synonymes</h5>
+            <ng-container *ngFor="let word of words; let i = index">
+              <ng-container
+                class="card-text"
+                *ngIf="word.r_type == 5 && word.poids > 0"
+              >
+                <a
+                  [routerLink]="[
+                    '/find/definition/',
+                    convertToFormatedName(word.r_node2)
+                  ]"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="id: {{ word.r_node2 }}, poids: {{ word.poids }}"
+                  >{{ parserFormatedName(word.r_node2) }}
+                </a>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="row justify-content-center spinner">
+    <ng-container *ngIf="words.length == 0 && !isLoading">
+      <h1>Pas de résultat possible pour cette motif</h1>
+    </ng-container>
+  </div>
+</div>

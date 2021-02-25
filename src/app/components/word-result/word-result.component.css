@@ -1,0 +1,45 @@
+div.button-collapse button {
+  margin: 0.3rem;
+}
+
+div.box {
+  margin-bottom: 10px;
+}
+
+.btn {
+  color: #fff;
+  background-color: #ff83ee;
+  border-color: white;
+}
+
+.btn[aria-expanded="true"] {
+  color: #000000;
+  background-color: #ff6cb5;
+}
+
+.btn:focus{
+  background-color: #ff7aed;
+  outline:0;
+  color:black;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active{
+  background-color: #ff49e7;
+  color:black;
+  outline: 0;
+  box-shadow: 0 0 0 0;
+}
+
+.box a {
+    display:inline;
+}
+
+.spinner{
+  margin-top: 3em;
+  width:100%;
+  place-items: center;
+}
+
+.box p {
+  margin-bottom: 0;
+}
